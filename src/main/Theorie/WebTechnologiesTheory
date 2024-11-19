@@ -26,6 +26,16 @@ Web protocols:
 - ensure that data is transmitted accurately and efficiently over the internet
 - they enable different devices and systems to communicate with each other effectively
 
+TCP/IP (Transmission Control Protocol/Internet Protocol):
+- suite of communication protocols used to interconnect network devices on the internet
+-> TCP ensures reliable data transmission
+-> IP handles addressing and routing
+
+UDP (User Datagram Protocol)
+- connectionless
+- does not establish a dedicated end-to-end connection
+- packages are send independently without ensuring they reach their destination
+
 HTTP (Hypertext Transfer Protocol): Port 80
 - foundation of data communication on the web
 - used for transferring web pages from servers to browsers
@@ -36,17 +46,12 @@ HTTPS (HTTP Secure): Port 443
 FTP (File Transfer Protocol): Port 20/21
 - used for transferring files between client and server on a network
 
-TCP/IP (Transmission Control Protocol/Internet Protocol):
-- suite of communication protocols used to interconnect network devices on the internet
--> TCP ensures reliable data transmission
--> IP handles addressing and routing
-
 SMTP (Simple Mail Transfer Protocol): Port 25
 - used for sending emails across networks
 
 IMAP and POP3 (Internet Message Access Protocol and Post Office Protocol)
 -> retrieve emails from a (email-)server
-->  IMAP Port 143
+-> IMAP Port 143
 -> POP3 Port 110
 
 Telnet: Port 23
@@ -55,7 +60,13 @@ Telnet: Port 23
 
 SSH (Secure Shell): 22
 - allows users to securely access and manage remote devices over an unsecured network
-- it then provides a secure channel for executing commands, transferring files and managing network services
+- it then provides a secure channel for executing commands, transferring files (SFTP) and managing network services
+
+DNS (Domain Name System) Port 52
+- Translates domain names into IP addresses so that users can reach target servers by entering names instead of IPs.
+
+DHCP (Dynamic Host Configuration Protocol) Port 67
+- assigns new devices on the network an IP-Address
 
 Web Interfaces
 - enable users to access and manipulate content and services on the internet
