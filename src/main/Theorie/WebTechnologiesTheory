@@ -68,18 +68,13 @@ DNS (Domain Name System) Port 52
 DHCP (Dynamic Host Configuration Protocol) Port 67
 - assigns new devices on the network an IP-Address
 
+Websocket
+- enables a bidirectional communication between browsers and servers
+- is used for realtime applications like chat apps and online games
+
 Web Interfaces
 - enable users to access and manipulate content and services on the internet
 - bridge between user and web app
-Components:
-- visual elements like buttons, menus and icons that users interact with
-- layout and organizations -> arrangement of the visual elements on the screen
-- Interactivity -> features like input fields, checkboxes, sliders
-
-- Frontend -> GUI
-- Backend -> handles user inputs
-          -> transfers data to the frontend
-          -> is connected to DB
-
+- based on web protocols
 API (Application Programming Interface)
-- Interface between Front- and Backend
+- Interface between between two systems (e.g. Front- and Backend)
