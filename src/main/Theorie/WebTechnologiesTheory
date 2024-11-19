@@ -1,0 +1,74 @@
+Theory
+
+DAO (Data Access Object):
+- is a design pattern
+- provides an abstract interface to a database or other persistence mechanisms
+
+1. Abstraction: DAO pattern abstracts and encapsulates all access to the data source. DAO manages connection with the data source
+                to obtain and store data
+2. Separation of Concerns: business logic of an application is separated from the data access logic
+                           -> Code gets more modular and easier to maintain
+3. CRUD Operations: DAOs provide methods for Create, Read, Update and Delete operations
+                    -> methods interact with the database without exposing the underlying details of the DB
+4. Implementation: ->DAO-Pattern.png
+
+JSON:
+- is a lightweight data interchange format that is easy for humans to read and write, and easy for machines to parse and generate
+- objects are written into {}
+- arrays are written into []
+- JSON supports several data types, including strings, numbers, objects, arrays, booleans, and null
+
+-> is commonly used for transmitting data between a server and a web application, as well as for config files and data storages
+-> is derived from javascript
+-> language independent -> many languages support JSON for data interchange
+
+Web protocols:
+- ensure that data is transmitted accurately and efficiently over the internet
+- they enable different devices and systems to communicate with each other effectively
+
+HTTP (Hypertext Transfer Protocol): Port 80
+- foundation of data communication on the web
+- used for transferring web pages from servers to browsers
+
+HTTPS (HTTP Secure): Port 443
+- includes encryption for secure communication over a computer network
+
+FTP (File Transfer Protocol): Port 20/21
+- used for transferring files between client and server on a network
+
+TCP/IP (Transmission Control Protocol/Internet Protocol):
+- suite of communication protocols used to interconnect network devices on the internet
+-> TCP ensures reliable data transmission
+-> IP handles addressing and routing
+
+SMTP (Simple Mail Transfer Protocol): Port 25
+- used for sending emails across networks
+
+IMAP and POP3 (Internet Message Access Protocol and Post Office Protocol)
+-> retrieve emails from a (email-)server
+->  IMAP Port 143
+-> POP3 Port 110
+
+Telnet: Port 23
+-  allows users to remotely access and manage devices over a TCP/IP Network
+-  has been replaced by ssh
+
+SSH (Secure Shell): 22
+- allows users to securely access and manage remote devices over an unsecured network
+- it then provides a secure channel for executing commands, transferring files and managing network services
+
+Web Interfaces
+- enable users to access and manipulate content and services on the internet
+- bridge between user and web app
+Components:
+- visual elements like buttons, menus and icons that users interact with
+- layout and organizations -> arrangement of the visual elements on the screen
+- Interactivity -> features like input fields, checkboxes, sliders
+
+- Frontend -> GUI
+- Backend -> handles user inputs
+          -> transfers data to the frontend
+          -> is connected to DB
+
+API (Application Programming Interface)
+- Interface between Front- and Backend
