@@ -1,7 +1,9 @@
 package Lager;
 
+import Factory.GenericDAO;
+
 import java.util.List;
 
 public interface LagerDAO {
-    List<Lager> getAllLager();
+    List<GenericDAO.Lager> getAllLager();
 }
