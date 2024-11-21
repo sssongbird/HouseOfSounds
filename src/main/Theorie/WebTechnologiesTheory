@@ -1,16 +1,16 @@
 Theory
 
-DAO (Data Access Object):
+Factory.DAO (Data Access Object):
 - is a design pattern
 - provides an abstract interface to a database or other persistence mechanisms
 
-1. Abstraction: DAO pattern abstracts and encapsulates all access to the data source. DAO manages connection with the data source
+1. Abstraction: Factory.DAO pattern abstracts and encapsulates all access to the data source. Factory.DAO manages connection with the data source
                 to obtain and store data
 2. Separation of Concerns: business logic of an application is separated from the data access logic
                            -> Code gets more modular and easier to maintain
 3. CRUD Operations: DAOs provide methods for Create, Read, Update and Delete operations
                     -> methods interact with the database without exposing the underlying details of the DB
-4. Implementation: ->DAO-Pattern.png
+4. Implementation: ->Factory.DAO-Pattern.png
 
 JSON:
 - is a lightweight data interchange format that is easy for humans to read and write, and easy for machines to parse and generate

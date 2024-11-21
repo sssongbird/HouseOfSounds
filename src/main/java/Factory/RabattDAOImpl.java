@@ -16,7 +16,7 @@ public class RabattDAOImpl implements RabattDAO {
     private static final String PASSWORD = "";
 
     @Override
-    public List<Rabatt> getAllRabatt() {
+    public List<Rabatt> getAll() {
         List<Rabatt> rabatte = new ArrayList<>();
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              Statement statement = connection.createStatement();

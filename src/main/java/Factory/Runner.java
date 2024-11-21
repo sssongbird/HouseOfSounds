@@ -7,7 +7,7 @@ public class Runner {
     public static void main(String[] args) {
 
         RabattDAO rabattDAO = new RabattDAOImpl();
-        List<Rabatt> rabatte = rabattDAO.getAllRabatt();
+        List<Rabatt> rabatte = rabattDAO.getAll();
 
         for (Rabatt rabatt : rabatte) {
             System.out.println("ID: " + rabatt.getRabatt_ID());
