@@ -1,15 +1,9 @@
-package org.example;
-import Factory.Rabatt;
-import Factory.RabattDAO;
-import Factory.RabattDAOImpl;
-import FactoryProdukte.Produkte;
-import FactoryProdukte.ProdukteDAO;
-import FactoryProdukte.ProdukteDAOImpl;
+package Factory;
 
 import java.util.List;
 
 
-public class Main {
+public class Runner {
     public static void main(String[] args) {
 
         RabattDAO rabattDAO = new RabattDAOImpl();
@@ -22,8 +16,5 @@ public class Main {
             System.out.println("Dauer: " + rabatt.getDauer() + " Tage");
             System.out.println("--------------------------------------------------------------");
         }
-
-
-
     }
 }
