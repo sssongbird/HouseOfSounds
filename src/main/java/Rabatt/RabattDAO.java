@@ -1,4 +1,6 @@
 package Rabatt;
+/*
+import Factory.Rabatt;
 
 import java.util.List;
 
@@ -9,3 +11,6 @@ public interface RabattDAO {
     //void updateRabatt(RabattDAO rabatt);
     //void deleteRabatt(int id);
 }
+
+
+ */

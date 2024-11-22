@@ -1,4 +1,7 @@
 package Rabatt;
+/*
+import Factory.Rabatt;
+import Factory.RabattDAOImpl;
 
 import java.util.List;
 
@@ -18,3 +21,5 @@ public class Runner {
         }
     }
 }
+
+ */

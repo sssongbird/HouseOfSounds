@@ -1,4 +1,4 @@
-package Rabatt;
+package Factory;
 
 public class Rabatt {
     private int Rabatt_ID;
@@ -36,6 +36,14 @@ public class Rabatt {
 
     public void setDauer(Integer Dauer) {
         this.Dauer = Dauer;
+    }
+
+    @Override
+        public String toString() {
+        return  "Rabatt ID: " + Rabatt_ID +
+                ", Rabattcode: " + Rabattcode +
+                ", Höhe Rabatt: " + Hoehe_Rabatt +
+                ", Dauer: " + Dauer;
     }
 }
 

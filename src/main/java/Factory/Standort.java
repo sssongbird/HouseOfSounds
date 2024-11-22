@@ -1,12 +1,12 @@
-package Standort;
+package Factory;
 
 public class Standort {
     private int Standort_ID;
     private String Standortname;
     private String Straße;
     private String Hausnummer;
-    private int PLZ;
-    private String Ort;
+    private int PLZ_ID;
+
 
     // Getter und Setter
     public int getStandort_ID() { return Standort_ID; }
@@ -21,9 +21,21 @@ public class Standort {
     public String getHausnummer() { return Hausnummer; }
     public void setHausnummer(String hausnummer) { this.Hausnummer = hausnummer; }
 
-    public int getPLZ() { return PLZ; }
-    public void setPLZ(int PLZ) { this.PLZ = PLZ; }
+    public int getPLZ_ID() { return PLZ_ID; }
+    public void setPLZ_ID(int PLZ_ID) { this.PLZ_ID = PLZ_ID; }
 
+
+        @Override
+        public String toString() {
+            return  " Standort ID: " + Standort_ID +
+                    ", Standortname: " + Standortname +
+                    ", Straße: " + Straße +
+                    ", Hausnummer: " + Hausnummer +
+                    ", PLZ_ID: " + PLZ_ID;
+        }
+    }
+/*
     public String getOrt() { return Ort; }
     public void setOrt(String ort) { this.Ort = ort; }
-}
+
+ */

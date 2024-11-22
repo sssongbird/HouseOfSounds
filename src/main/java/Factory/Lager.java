@@ -37,4 +37,12 @@ public class Lager {
     */
     public int getProdukt_ID() { return Produkt_ID; }
     public void setProdukt_ID(int produkt_ID) { this.Produkt_ID = produkt_ID; }
+
+    @Override
+    public String toString() {
+        return  "Lager ID: " + Lager_ID +
+                ", Anzahl Produkte im Lager: " + Anzahl_Produkte_Im_Lager +
+                ", Standortname: " + Standort_ID +
+                ", Produkt ID: " + Produkt_ID;
+    }
 }

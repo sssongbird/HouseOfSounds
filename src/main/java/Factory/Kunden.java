@@ -1,12 +1,11 @@
-package Kunden;
+package Factory;
 
 public class Kunden {
         private String Vorname;
         private String Nachname;
         private String Straße;
         private String Hausnummer;
-        private int PLZ;
-        private String Ort;
+        private int PLZ_ID;
 
         // private int PLZ_ID;
 
@@ -42,31 +41,23 @@ public class Kunden {
         public void setHausnummer(String Hausnummer) {
             this.Hausnummer = Hausnummer;
         }
-        public int getPLZ() {
-            return PLZ;
-        }
-        public void setPLZ(int PLZ) {
-            this.PLZ = PLZ;
-        }
 
-        public String getOrt() {
-            return Ort;
-        }
 
-        public void setOrt(String Ort) {
-            this.Ort = Ort;
-        }
-
-/*
-        public int getPLZ_ID() {
+        public int getPLZ_ID(){
             return PLZ_ID;
         }
 
         public void setPLZ_ID(int PLZ_ID) {
             this.PLZ_ID = PLZ_ID;
         }
-*/
 
-
-
+    @Override
+    public String toString() {
+        return  "Vorname: " + Vorname +
+                ", Nachname: " + Nachname +
+                ", Straße: " + Straße +
+                ", Hausnummer: " + Hausnummer +
+                ", PLZ: " + PLZ_ID;
     }
+}
+

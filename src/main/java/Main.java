@@ -1,28 +1,60 @@
 import Factory.DAOFactory;
 import Factory.GenericDAO;
-import Factory.LagerDaoImplement;
-import Factory.*;
+import Factory.Lager;
+import Factory.PLZ;
+import Factory.Produkte;
+import Factory.Rabatt;
+import Factory.Kunden;
+import Factory.Standort;
 
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import java.util.Scanner;
 
 public class Main {
+    private static final Map<Integer, Class<?>> tableOptions = new HashMap<>();
+
+    static {
+        tableOptions.put(1, Lager.class);
+        tableOptions.put(2, PLZ.class);
+        tableOptions.put(3, Produkte.class);
+        tableOptions.put(4, Rabatt.class);
+        tableOptions.put(5, Kunden.class);
+        tableOptions.put(6, Standort.class);
+    }
+
     public static void main(String[] args) {
-        GenericDAO<Lager> lagerDAO = DAOFactory.getDAO(Lager.class);
-        List<Lager> lagerList = lagerDAO.getAll();
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
 
-        for (Lager lager : lagerList) {
-            System.out.println("Lager ID: " + lager.getLager_ID());
-            System.out.println("Anzahl Produkte im Lager: " + lager.getAnzahl_Produkte_Im_Lager());
-            System.out.println("Standort_ID: " + lager.getStandort_ID());
-            /*
-            System.out.println("Straße: " + lager.getStraße());
-            System.out.println("Hausnummer: " + lager.getHausnummer());
-            System.out.println("PLZ: " + lager.getPLZ());
-            System.out.println("Ort: " + lager.getOrt());
+        while (running) {
+            System.out.println("Welche Tabelle möchten Sie anzeigen?");
+            tableOptions.forEach((key, value) -> System.out.println(key + ". " + value.getSimpleName()));
+            System.out.println((tableOptions.size() + 1) + ". Beenden");
+            System.out.print("Bitte wählen Sie eine Option: ");
 
-             */
-            System.out.println("Produkt ID: " + lager.getProdukt_ID());
+            int choice = scanner.nextInt();
+            if (choice == tableOptions.size() + 1) {
+                running = false;
+            } else {
+                Class<?> clazz = tableOptions.get(choice);
+                if (clazz != null) {
+                    printTable(clazz);
+                } else {
+                    System.out.println("Ungültige Auswahl. Bitte versuchen Sie es erneut.");
+                }
+            }
+        }
+        scanner.close();
+    }
+
+    private static <T> void printTable(Class<T> clazz) {
+        GenericDAO<T> dao = DAOFactory.getDAO(clazz);
+        List<T> records = dao.getAll();
+
+        for (T record : records) {
+            System.out.println(record.toString());
             System.out.println("---------------------------");
         }
     }
