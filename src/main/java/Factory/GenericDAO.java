@@ -10,7 +10,7 @@ public class GenericDAO<T> {
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
-    private final String tableName; // Tabellenname, z. B. "Rabatt" oder "Kunden"
+    private final String tableName;
     private final Function<ResultSet, T> mapper; // Funktion, die ein ResultSet in ein Objekt umwandelt
 
     public GenericDAO(String tableName, Function<ResultSet, T> mapper) {

@@ -1,5 +1,7 @@
 package Factory;
 
-public interface KundenDAO extends DAO<Kunden>{
+public interface KundenDAO extends InterGenericDAO<Kunden> {
 
 }
+
+

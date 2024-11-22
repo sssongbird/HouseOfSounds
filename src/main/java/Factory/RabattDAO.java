@@ -1,5 +1,5 @@
 package Factory;
 
-public interface RabattDAO extends DAO<Rabatt>{
+public class RabattDAO implements GenericDAO<Rabatt> {
 
 }

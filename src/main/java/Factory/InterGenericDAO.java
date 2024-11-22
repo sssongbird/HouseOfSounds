@@ -2,7 +2,7 @@ package Factory;
 
 import java.util.List;
 
-public interface DAO <T>{
+public interface InterGenericDAO<T>{
     List<T> getAll();
     void add(T item);
     T get(int id);
