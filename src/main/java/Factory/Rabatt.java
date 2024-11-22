@@ -37,5 +37,14 @@ public class Rabatt {
     public void setDauer(Integer Dauer) {
         this.Dauer = Dauer;
     }
+
+    public String toString() {
+        return "Rabatt: " +
+                "\nRabatt_ID: " + Rabatt_ID +
+                "\nRabattcode: '" + Rabattcode + '\'' +
+                "\nHoehe_Rabatt: " + Hoehe_Rabatt +
+                "\nDauer: " + Dauer + "\n---------------------------";
+
+    }
 }
 

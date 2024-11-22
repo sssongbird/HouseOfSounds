@@ -1,18 +1,15 @@
 package org.example;
 import Factory.Rabatt;
 import Factory.RabattDAO;
-import Factory.RabattDAOImpl;
-import FactoryProdukte.Produkte;
-import FactoryProdukte.ProdukteDAO;
-import FactoryProdukte.ProdukteDAOImpl;
+import Factory.GenericDAO;
 
 import java.util.List;
 
 
 public class Main {
     public static void main(String[] args) {
-
-        RabattDAO rabattDAO = new RabattDAOImpl();
+        /*
+        RabattDAO rabattDAO = new DatabaseService();
         List<Rabatt> rabatte = rabattDAO.getAll();
 
         for (Rabatt rabatt : rabatte) {
@@ -22,6 +19,8 @@ public class Main {
             System.out.println("Dauer: " + rabatt.getDauer() + " Tage");
             System.out.println("--------------------------------------------------------------");
         }
+        */
+
 
 
 

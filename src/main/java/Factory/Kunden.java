@@ -1,4 +1,4 @@
-package FactoryKunden;
+package Factory;
 
 public class Kunden {
         private String Vorname;
@@ -57,6 +57,18 @@ public class Kunden {
             this.Ort = Ort;
         }
 
+    public String toString() {
+        return "Rabatt{" +
+                "\nVorname: " + Vorname +
+                ", \nNachname: '" + Nachname + '\'' +
+                ", \nHoehe_Rabatt: " + Straße +
+                ", \nHausnummer: " + Hausnummer +
+                ", \nHausnummer: " + Hausnummer + "\n---------------------------";
+
+    }
+
+
+
 /*
         public int getPLZ_ID() {
             return PLZ_ID;
@@ -68,5 +80,4 @@ public class Kunden {
 */
 
 
-
-    }
+}
