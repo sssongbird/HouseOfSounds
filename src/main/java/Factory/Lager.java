@@ -1,6 +1,6 @@
 package Factory;
 
-class Lager {
+public class Lager {
     private String Lager_ID;
     private int Anzahl_Produkte_Im_Lager;
     /*
