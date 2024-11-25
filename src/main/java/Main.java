@@ -1,11 +1,4 @@
-import Factory.DAOFactory;
-import Factory.GenericDAO;
-import Factory.Lager;
-import Factory.PLZ;
-import Factory.Produkte;
-import Factory.Rabatt;
-import Factory.Kunden;
-import Factory.Standort;
+import Factory.*;
 
 import java.util.HashMap;
 import java.util.List;
