@@ -8,7 +8,7 @@ public class Kunden {
         private int PLZ;
         private String Ort;
 
-        // private int PLZ_ID;
+
 
         // Getter und Setter
         public String getVorname() {

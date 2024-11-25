@@ -1,6 +1,6 @@
 package org.example;
 import Factory.Rabatt;
-import Factory.RabattDAO;
+
 import Factory.GenericDAO;
 
 import java.util.List;

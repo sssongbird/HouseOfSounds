@@ -1,5 +1,5 @@
-package Factory;
+//package Factory;
 
-public class RabattDAO implements GenericDAO<Rabatt> {
+//public class RabattDAO implements GenericDAO<Rabatt> {
 
-}
+//}

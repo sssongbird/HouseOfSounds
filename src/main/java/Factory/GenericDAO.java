@@ -3,40 +3,38 @@ package Factory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
-public class GenericDAO<T> {
+
+public abstract class GenericDAO<T> implements InterGenericDAO<T> {
     private static final String URL = "jdbc:mysql://localhost:3306/houseofsounds";
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
-    private final String tableName;
-    private final Function<ResultSet, T> mapper; // Funktion, die ein ResultSet in ein Objekt umwandelt
+    protected abstract T mapResultSetToEntity(ResultSet resultSet) throws Exception;
 
-    public GenericDAO(String tableName, Function<ResultSet, T> mapper) {
-        this.tableName = tableName;
-        this.mapper = mapper;
-    }
+    protected abstract String getTableName();
 
     // CRUD-Operationen
 
     // Alle Einträge aus der Tabelle abrufen
+    @Override
     public List<T> getAll() {
-        List<T> list = new ArrayList<>();
-        String query = "SELECT * FROM " + tableName;
+        List<T> entities = new ArrayList<>();
+
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + getTableName())) {
 
             while (resultSet.next()) {
-                list.add(mapper.apply(resultSet)); // Mapping-Funktion wird verwendet
+                T entity = mapResultSetToEntity(resultSet);
+                entities.add(entity);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return list;
+        return entities;
     }
-
+    /*
     // Ein einzelnes Objekt per ID abrufen
     public T getById(int id) {
         String query = "SELECT * FROM " + tableName + " WHERE id = ?";
@@ -81,4 +79,5 @@ public class GenericDAO<T> {
             throw new RuntimeException("Fehler bei der SQL-Abfrage: " + e.getMessage(), e);
         }
     }
+    */
 }

@@ -1,36 +1,36 @@
 package Factory;
 
+import FactoryLager.Lager;
+import FactoryLager.LagerDaoImplement;
+
 import java.sql.SQLException;
 import java.util.List;
 
 public class Runner {
     public static void main(String[] args) {
-        // Erstellung des GenericDAO für Rabatt
-        GenericDAO<Rabatt> rabattDAO = new GenericDAO<>("Rabatt", RabattMapper::map);
+        LagerDaoImplement lagerDao = new LagerDaoImplement() {
+            @Override
+            public void add(Lager item) {
 
-        List<Rabatt> rabatte = rabattDAO.getAll();
-        rabatte.forEach(System.out::println);
+            }
 
-        /*
+            @Override
+            public Lager get(int id) {
+                return null;
+            }
 
-        public static void main(String[] args) {
-        KundenDAO kundenDAO = new KundenDaoImplement();
-        List<Kunden> kunden = kundenDAO.getAllKunden();
+            @Override
+            public void update(Lager item) {
 
-        for (Kunden kunde : kunden) {
-            System.out.println("Vorname: " + kunde.getVorname());
-            System.out.println("Nachname: " + kunde.getNachname());
-            System.out.println("Straße: " + kunde.getStraße());
-            System.out.println("Hausnummer: " + kunde.getHausnummer());
-            // System.out.println("PLZ_ID: " + kunde.getPLZ_ID());
+            }
 
-            System.out.println("PLZ: " + kunde.getPLZ());
-            System.out.println("Ort: " + kunde.getOrt());
+            @Override
+            public void delete(int id) {
+
+            }
+        };
+        TablePrinter.printTable("Lagerbestand House of Sounds", lagerDao.getAll());
 
 
-            System.out.println("---------------------------");
-        }
-    }
-         */
     }
 }
