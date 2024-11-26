@@ -19,11 +19,10 @@ public class Main {
         dataLoaderThread = new Thread(() -> {
             while (isRunning) {
                 try {
-                    // Alte Daten löschen
+
                     kundenList.clear();
                     produkteList.clear();
 
-                    // Neue Daten laden
                     kundenList.addAll(kundenDAO.getAll());
                     produkteList.addAll(produkteDAO.getAll());
 
@@ -31,8 +30,7 @@ public class Main {
                             kundenList.size() + " Kunden, " +
                             produkteList.size() + " Produkte");
 
-                    // Wartezeit zwischen Updates
-                    Thread.sleep(5000); // Alle 5 Sekunden updaten
+                    Thread.sleep(5000); // Wartezeit
                 } catch (Exception e) {
                     e.printStackTrace();
                     isRunning = false;
@@ -51,7 +49,6 @@ public class Main {
         }
     }
 
-    // Neue Methoden zum manuellen Leeren der Listen
     public static void clearKundenList() {
         kundenList.clear();
     }
@@ -60,7 +57,6 @@ public class Main {
         produkteList.clear();
     }
 
-    // Getter für andere Klassen
     public static List<Kunden> getKundenList() {
         return kundenList;
     }
@@ -69,14 +65,11 @@ public class Main {
         return produkteList;
     }
 
-    // Hauptmethode zum separaten Ausführen
     public static void main(String[] args) {
         System.out.println("Runtime Data Loader gestartet");
         startDataLoader();
 
-        // Halten des Programms offen
         try {
-            // Warten, bis der Thread unterbrochen wird
             while (isRunning) {
                 Thread.sleep(1000);
             }

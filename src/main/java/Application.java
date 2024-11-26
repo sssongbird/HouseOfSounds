@@ -28,9 +28,10 @@ public class Application {
             if ("GET".equals(exchange.getRequestMethod())) {
                 List<Kunden> kunden;
 
-                // Wenn Runtime nicht aktiv, erzwinge Neuladung
+
                 if (!isRuntimeActive) {
                     Main.clearKundenList();
+
                 }
 
                 kunden = Main.getKundenList();
@@ -46,14 +47,13 @@ public class Application {
             }
         });
 
-        // Endpunkt Produkte
         server.createContext("/api/items/produkte", exchange -> {
             if ("GET".equals(exchange.getRequestMethod())) {
                 List<Produkte> produkte;
 
-                // Wenn Runtime nicht aktiv, erzwinge Neuladung
                 if (!isRuntimeActive) {
                     Main.clearProdukteList();
+                    Main.clearKundenList();
                 }
 
                 produkte = Main.getProdukteList();
@@ -69,40 +69,37 @@ public class Application {
             }
         });
 
-        // Endpunkt zum Tracken des Runtime-Status
-        server.createContext("/api/runtime-status", exchange -> {
-            if ("GET".equals(exchange.getRequestMethod())) {
-                sendJsonResponse(exchange, 200, "{\"isActive\": " + isRuntimeActive + "}");
-            } else {
-                sendResponse(exchange, 405, "Method Not Allowed");
-            }
-        });
-
-        // Endpunkt zum Setzen des Runtime-Status
-        server.createContext("/api/set-runtime-status", exchange -> {
-            if ("POST".equals(exchange.getRequestMethod())) {
-                // Lesen des Status aus dem Request Body
-                String body = new String(exchange.getRequestBody().readAllBytes());
-                isRuntimeActive = Boolean.parseBoolean(body);
-
-                if (!isRuntimeActive) {
-                    Main.stopDataLoader();
-                } else {
-                    Main.startDataLoader();
-                }
-
-                sendResponse(exchange, 200, "Runtime status updated to: " + isRuntimeActive);
-            } else {
-                sendResponse(exchange, 405, "Method Not Allowed");
-            }
-        });
+        //server.createContext("/api/runtime-status", exchange -> {
+        //    if ("GET".equals(exchange.getRequestMethod())) {
+        //        sendJsonResponse(exchange, 200, "{\"isActive\": " + isRuntimeActive + "}");
+        //    } else {
+        //        sendResponse(exchange, 405, "Method Not Allowed");
+        //    }
+        //});
+//
+        //server.createContext("/api/set-runtime-status", exchange -> {
+        //    if ("POST".equals(exchange.getRequestMethod())) {
+//
+        //        String body = new String(exchange.getRequestBody().readAllBytes());
+        //        isRuntimeActive = Boolean.parseBoolean(body);
+//
+        //        if (!isRuntimeActive) {
+        //            Main.stopDataLoader();
+        //        } else {
+        //            Main.startDataLoader();
+        //        }
+//
+        //        sendResponse(exchange, 200, "Runtime status updated to: " + isRuntimeActive);
+        //    } else {
+        //        sendResponse(exchange, 405, "Method Not Allowed");
+        //    }
+        //});
 
         server.setExecutor(null);
         server.start();
         System.out.println("REST-API läuft auf Port " + serverPort);
     }
 
-    // Vorherige sendJsonResponse und sendResponse Methoden bleiben unverändert
     private static void sendJsonResponse(HttpExchange exchange, int statusCode, Object data) {
         try {
             String jsonResponse = gson.toJson(data);
