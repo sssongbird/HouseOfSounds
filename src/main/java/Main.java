@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
+    private static final Map<String, Object> sharedData = new HashMap<>();
     private static final Map<Integer, Class<?>> tableOptions = new HashMap<>();
 
     static {
@@ -25,7 +26,8 @@ public class Main {
             System.out.println("Welche Tabelle möchten Sie anzeigen?");
             tableOptions.forEach((key, value) -> System.out.println(key + ". " + value.getSimpleName()));
             System.out.println((tableOptions.size() + 1) + ". Beenden");
-            System.out.print("Bitte wählen Sie eine Option: ");
+            //System.out.print("Bitte wählen Sie eine Option: ");
+
 
             int choice = scanner.nextInt();
             if (choice == tableOptions.size() + 1) {
@@ -38,6 +40,8 @@ public class Main {
                     System.out.println("Ungültige Auswahl. Bitte versuchen Sie es erneut.");
                 }
             }
+
+
         }
         scanner.close();
     }
@@ -48,7 +52,8 @@ public class Main {
 
         for (T record : records) {
             System.out.println(record.toString());
-            System.out.println("---------------------------");
+            System.out.println("---------------------------------------------");
+
         }
     }
 }
