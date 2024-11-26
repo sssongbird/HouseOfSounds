@@ -3,71 +3,132 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-import Factory.*;
+import Factory.Kunden;
+import Factory.Produkte;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import Factory.Kunden;
+import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-/*
-erstellt einen Kontext für den Pfad /api/hello und definiert einen Handler für eingehende Anfragen
-sendet die http-Statuszeile und die Header. 200 ist der Statuscode für OK
-holt den Antwortstrom / schreibt die Antwortnachricht in den Antwortstrom / stellt sicher das alle Daten gesendet werden
-schließt danach den Austausch und beendet die Antwort
-startet den Server im letzten Schritt
- */
-class Application {
 
-    //private static GenericDAO<Kunden> dao = DAOFactory.getDAO(Kunden.class);
-    //private static GenericDAO<Produkte> dao2 = DAOFactory.getDAO(Produkte.class);
-    static GenericDAO<Kunden> dao = DAOFactory.getDAO(Kunden.class);
-    static GenericDAO<Produkte> dao2 = DAOFactory.getDAO(Produkte.class);
-
-
+public class Application {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static volatile boolean isRuntimeActive = false;
 
     public static void main(String[] args) throws IOException {
+        // Starten des Dataloaders
+        Main.startDataLoader();
+        isRuntimeActive = true;
+
         int serverPort = 8000;
         HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
-        server.createContext("/api/hello", (exchange -> {
-            String respText = "Hello!";
-            exchange.sendResponseHeaders(200, respText.getBytes().length);
-            OutputStream output = exchange.getResponseBody();
-            output.write(respText.getBytes());
-            output.flush();
-            exchange.close();
-        }));
 
-        server.createContext("/api/items/kunden", (exchange -> {
+        // Endpunkt Kunden
+        server.createContext("/api/items/kunden", exchange -> {
             if ("GET".equals(exchange.getRequestMethod())) {
-                List<Kunden> kunden = dao.getAll();
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                String response = gson.toJson(kunden);
-                exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
-                exchange.sendResponseHeaders(200, response.getBytes().length);
-                OutputStream output = exchange.getResponseBody();
-                output.write(response.getBytes());
-                output.flush();
-                exchange.close();
-            } else {
-                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
-            }
-        }));
+                List<Kunden> kunden;
 
-        server.createContext("/api/items/produkte", (exchange -> {
-            if ("GET".equals(exchange.getRequestMethod())) {
-                List<Produkte> produkte = dao2.getAll();
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                String response = gson.toJson(produkte);
-                exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
-                exchange.sendResponseHeaders(200, response.getBytes().length);
-                OutputStream output = exchange.getResponseBody();
-                output.write(response.getBytes());
-                output.flush();
-                exchange.close();
+                // Wenn Runtime nicht aktiv, erzwinge Neuladung
+                if (!isRuntimeActive) {
+                    Main.clearKundenList();
+                }
+
+                kunden = Main.getKundenList();
+
+                if (kunden.isEmpty()) {
+                    sendResponse(exchange, 404, "Keine Kunden-Daten verfügbar");
+                } else {
+                    System.out.println("Daten für Kunden-API: " + gson.toJson(kunden));
+                    sendJsonResponse(exchange, 200, kunden);
+                }
             } else {
-                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+                sendResponse(exchange, 405, "Method Not Allowed");
             }
-        }));
-        server.setExecutor(null); // creates a default executor
+        });
+
+        // Endpunkt Produkte
+        server.createContext("/api/items/produkte", exchange -> {
+            if ("GET".equals(exchange.getRequestMethod())) {
+                List<Produkte> produkte;
+
+                // Wenn Runtime nicht aktiv, erzwinge Neuladung
+                if (!isRuntimeActive) {
+                    Main.clearProdukteList();
+                }
+
+                produkte = Main.getProdukteList();
+
+                if (produkte.isEmpty()) {
+                    sendResponse(exchange, 404, "Keine Produkte-Daten verfügbar");
+                } else {
+                    System.out.println("Daten für Produkte-API: " + gson.toJson(produkte));
+                    sendJsonResponse(exchange, 200, produkte);
+                }
+            } else {
+                sendResponse(exchange, 405, "Method Not Allowed");
+            }
+        });
+
+        // Endpunkt zum Tracken des Runtime-Status
+        server.createContext("/api/runtime-status", exchange -> {
+            if ("GET".equals(exchange.getRequestMethod())) {
+                sendJsonResponse(exchange, 200, "{\"isActive\": " + isRuntimeActive + "}");
+            } else {
+                sendResponse(exchange, 405, "Method Not Allowed");
+            }
+        });
+
+        // Endpunkt zum Setzen des Runtime-Status
+        server.createContext("/api/set-runtime-status", exchange -> {
+            if ("POST".equals(exchange.getRequestMethod())) {
+                // Lesen des Status aus dem Request Body
+                String body = new String(exchange.getRequestBody().readAllBytes());
+                isRuntimeActive = Boolean.parseBoolean(body);
+
+                if (!isRuntimeActive) {
+                    Main.stopDataLoader();
+                } else {
+                    Main.startDataLoader();
+                }
+
+                sendResponse(exchange, 200, "Runtime status updated to: " + isRuntimeActive);
+            } else {
+                sendResponse(exchange, 405, "Method Not Allowed");
+            }
+        });
+
+        server.setExecutor(null);
         server.start();
+        System.out.println("REST-API läuft auf Port " + serverPort);
+    }
+
+    // Vorherige sendJsonResponse und sendResponse Methoden bleiben unverändert
+    private static void sendJsonResponse(HttpExchange exchange, int statusCode, Object data) {
+        try {
+            String jsonResponse = gson.toJson(data);
+            exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
+            exchange.sendResponseHeaders(statusCode, jsonResponse.getBytes().length);
+            try (OutputStream output = exchange.getResponseBody()) {
+                output.write(jsonResponse.getBytes());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            exchange.close();
+        }
+    }
+
+    private static void sendResponse(HttpExchange exchange, int statusCode, String responseText) {
+        try {
+            byte[] responseBytes = responseText.getBytes();
+            exchange.sendResponseHeaders(statusCode, responseBytes.length);
+            try (OutputStream output = exchange.getResponseBody()) {
+                output.write(responseBytes);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            exchange.close();
+        }
     }
 }
