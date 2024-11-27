@@ -1,11 +1,10 @@
 package Factory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.lang.reflect.Field;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
     private static final String URL = "jdbc:mysql://localhost:3306/houseofsounds";
@@ -35,14 +34,75 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
 
     @Override
     public T getById(int id) {
-        // Implementiere die Methode, um eine Entität nach ID zu holen
+
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM " + getTableName() + "WHERE ID = ?")){
+
+            while (resultSet.next()) {
+                T entity = mapResultSetToEntity(resultSet);
+
+            }
+
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
     @Override
     public void save(T entity) {
-        // Implementiere die Methode, um eine Entität zu speichern
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)){
+            Field[] fields = entity.getClass().getDeclaredFields();
+
+            List<String> columnNames = new ArrayList<>();
+            List<Object> values = new ArrayList<>();
+
+            for (Field field : fields) {
+                field.setAccessible(true);
+
+                try {
+                    Object value = field.get(entity);
+                    if (value != null) {
+                        columnNames.add(field.getName());
+                        values.add(value);
+                    }
+
+                } catch (IllegalAccessException e) {
+                    System.err.println("Couldnt access field: " + field.getName());
+                }
+            }
+            String columns = String.join(",", columnNames);
+            String placeholders = columnNames.stream()
+                    .map(col -> "?")
+                    .collect(Collectors.joining(", "));
+
+            String insertQuery = "INSERT INTO " + getTableName() + " (" + columns + ") VALUES (" + placeholders + ")";
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)){
+                for (int i = 0; i < values.size(); i++) {
+                    preparedStatement.setObject(i + 1, values.get(i));
+                }
+
+                preparedStatement.executeUpdate();
+
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Database Error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
+    private String getTableName(Class<?> entityClass) {
+        return entityClass.getSimpleName().toLowerCase();
+    }
+
+
 
     @Override
     public void update(T entity) {

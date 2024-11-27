@@ -24,6 +24,7 @@ public class Main {
                     produkteList.clear();
 
                     kundenList.addAll(kundenDAO.getAll());
+
                     produkteList.addAll(produkteDAO.getAll());
 
                     System.out.println("Daten aktualisiert: " +
@@ -78,5 +79,10 @@ public class Main {
         } finally {
             stopDataLoader();
         }
+
+        Kunden newKunde = new Kunden();
+        kundenDAO.save(newKunde);
+
+
     }
 }

@@ -31,10 +31,12 @@ public class Application {
 
                 if (!isRuntimeActive) {
                     Main.clearKundenList();
+                    Main.clearProdukteList();
 
                 }
 
                 kunden = Main.getKundenList();
+
 
                 if (kunden.isEmpty()) {
                     sendResponse(exchange, 404, "Keine Kunden-Daten verfügbar");
@@ -68,32 +70,6 @@ public class Application {
                 sendResponse(exchange, 405, "Method Not Allowed");
             }
         });
-
-        //server.createContext("/api/runtime-status", exchange -> {
-        //    if ("GET".equals(exchange.getRequestMethod())) {
-        //        sendJsonResponse(exchange, 200, "{\"isActive\": " + isRuntimeActive + "}");
-        //    } else {
-        //        sendResponse(exchange, 405, "Method Not Allowed");
-        //    }
-        //});
-//
-        //server.createContext("/api/set-runtime-status", exchange -> {
-        //    if ("POST".equals(exchange.getRequestMethod())) {
-//
-        //        String body = new String(exchange.getRequestBody().readAllBytes());
-        //        isRuntimeActive = Boolean.parseBoolean(body);
-//
-        //        if (!isRuntimeActive) {
-        //            Main.stopDataLoader();
-        //        } else {
-        //            Main.startDataLoader();
-        //        }
-//
-        //        sendResponse(exchange, 200, "Runtime status updated to: " + isRuntimeActive);
-        //    } else {
-        //        sendResponse(exchange, 405, "Method Not Allowed");
-        //    }
-        //});
 
         server.setExecutor(null);
         server.start();
