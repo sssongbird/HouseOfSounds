@@ -3,11 +3,11 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Main {
-    private static final CopyOnWriteArrayList<Kunden> kundenList = new CopyOnWriteArrayList<>();
-    private static final CopyOnWriteArrayList<Produkte> produkteList = new CopyOnWriteArrayList<>();
+    public static final CopyOnWriteArrayList<Kunden> kundenList = new CopyOnWriteArrayList<>();
+    public static final CopyOnWriteArrayList<Produkte> produkteList = new CopyOnWriteArrayList<>();
 
-    private static final GenericDAO<Kunden> kundenDAO = DAOFactory.getDAO(Kunden.class);
-    private static final GenericDAO<Produkte> produkteDAO = DAOFactory.getDAO(Produkte.class);
+    public static final GenericDAO<Kunden> kundenDAO = DAOFactory.getDAO(Kunden.class);
+    public static final GenericDAO<Produkte> produkteDAO = DAOFactory.getDAO(Produkte.class);
 
     private static volatile boolean isRunning = false;
     private static Thread dataLoaderThread;
@@ -81,7 +81,11 @@ public class Main {
         }
 
         Kunden newKunde = new Kunden();
+        // Set Kunde properties
         kundenDAO.save(newKunde);
+
+        Produkte newProdukt = new Produkte();
+        produkteDAO.save(newProdukt);
 
 
     }
