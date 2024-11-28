@@ -42,7 +42,8 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return mapResultSetToEntity(resultSet);
+                    // Die Methode mapResultSetToEntity aufrufen, um das ResultSet in die Entität zu konvertieren
+                    return mapResultSetToEntity(resultSet, (Class<T>) this.getClass());
                 }
             }
         } catch (Exception e) {
@@ -51,9 +52,6 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
 
         return null;
     }
-
-
-
 
 
     @Override
@@ -250,5 +248,44 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
         }
         return null;
     }
+
+    private T mapResultSetToEntity(ResultSet resultSet, Class<T> entityClass) throws SQLException {
+        try {
+            // Neue Instanz der Entität erstellen
+            T entity = entityClass.getDeclaredConstructor().newInstance();
+
+            // Hole alle Felder der Entität
+            Field[] fields = entityClass.getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true); // Falls private Felder vorhanden sind
+
+                // Der Name des Feldes wird als Spaltenname in der DB angenommen
+                String columnName = field.getName();
+
+                // Überprüfe, ob das ResultSet die Spalte enthält
+                if (resultSetMetaDataContainsColumn(resultSet, columnName)) {
+                    Object value = resultSet.getObject(columnName); // Hole den Wert aus dem ResultSet
+                    field.set(entity, value); // Setze den Wert im Entitäten-Objekt
+                }
+            }
+
+            return entity;
+        } catch (Exception e) {
+            throw new SQLException("Fehler beim Mappen des ResultSets auf die Entität", e);
+        }
+    }
+
+
+    private boolean resultSetMetaDataContainsColumn(ResultSet resultSet, String columnName) throws SQLException {
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        for (int i = 1; i <= columnCount; i++) {
+            if (metaData.getColumnName(i).equalsIgnoreCase(columnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

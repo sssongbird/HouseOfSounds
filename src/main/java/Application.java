@@ -205,43 +205,38 @@ public class Application {
 
         });
 
-        server.createContext("/api/items/kunden/{id}", exchange -> {
+
+        server.createContext("/api/items/{type}/{id}", exchange -> {
             if ("GET".equals(exchange.getRequestMethod())) {
                 try {
-                    int kundenId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[4]);
-                    Kunden kunde = Main.kundenDAO.getById(kundenId);
+                    // Extrahiere den Entitätstyp (z.B. "kunden" oder "produkte") aus der URL
+                    String type = exchange.getRequestURI().getPath().split("/")[3];
+                    int id = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[4]);
 
-                    if (kunde != null) {
-                        sendJsonResponse(exchange, 200, kunde);
-                    } else {
-                        sendResponse(exchange, 404, "Kunde nicht gefunden");
+                    // Den passenden DAO anhand des Entitätstyps finden
+                    Object entity = null;
+                    if ("kunden".equalsIgnoreCase(type)) {
+                        // Dynamisch die Methode getById aus dem KundenDAO aufrufen
+                        entity = Main.kundenDAO.getById(id);
+                    } else if ("produkte".equalsIgnoreCase(type)) {
+                        // Dynamisch die Methode getById aus dem ProdukteDAO aufrufen
+                        entity = Main.produkteDAO.getById(id);
                     }
+
+                    if (entity != null) {
+                        sendJsonResponse(exchange, 200, entity);
+                    } else {
+                        sendResponse(exchange, 404, "Entität nicht gefunden");
+                    }
+
                 } catch (NumberFormatException e) {
-                    sendResponse(exchange, 400, "Ungültige Kunden-ID");
+                    sendResponse(exchange, 400, "Ungültige ID");
                 }
             } else {
                 sendResponse(exchange, 405, "Method Not Allowed");
             }
         });
 
-        server.createContext("/api/items/produkte/{id}", exchange -> {
-            if ("GET".equals(exchange.getRequestMethod())) {
-                try {
-                    int produkteId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[4]);
-                    Produkte produkt = Main.produkteDAO.getById(produkteId);
-
-                    if (produkt != null) {
-                        sendJsonResponse(exchange, 200, produkt);
-                    } else {
-                        sendResponse(exchange, 404, "Produkt nicht gefunden");
-                    }
-                } catch (NumberFormatException e) {
-                    sendResponse(exchange, 400, "Ungültige Produkt-ID");
-                }
-            } else {
-                sendResponse(exchange, 405, "Method Not Allowed");
-            }
-        });
 
         server.setExecutor(null);
         server.start();
