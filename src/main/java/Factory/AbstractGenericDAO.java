@@ -36,14 +36,14 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
     @Override
     public T getById(int id) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM " + getTableName() + " WHERE ID = ?")) {
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM " + getTableName() + " WHERE " + getIdColumname() + " = ?")) {
 
             statement.setInt(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     // Die Methode mapResultSetToEntity aufrufen, um das ResultSet in die Entität zu konvertieren
-                    return mapResultSetToEntity(resultSet, (Class<T>) this.getClass());
+                    return mapResultSetToEntity(resultSet);
                 }
             }
         } catch (Exception e) {
@@ -172,41 +172,24 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
     public void delete(T entity) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
 
+            // Primärschlüsselfeld finden
             Field primaryKeyField = findPrimaryKeyField(entity.getClass());
-
             if (primaryKeyField == null) {
                 throw new IllegalArgumentException("Kein Primärschlüsselfeld für Löschvorgang gefunden");
             }
 
+            // Wert des Primärschlüssels ermitteln
             primaryKeyField.setAccessible(true);
             Object primaryKeyValue = primaryKeyField.get(entity);
-
             if (primaryKeyValue == null) {
                 throw new IllegalArgumentException("Primärschlüsselwert muss für Löschvorgang gesetzt sein");
             }
 
-            // 1. Einträge aus firmenrechnung löschen
-            try (PreparedStatement deleteFirmenrechnung = connection.prepareStatement(
-                    "DELETE FROM firmenrechnung WHERE Nachbestellung_ID IN (SELECT Nachbestellung_ID FROM nachbestellung WHERE Produkte_ID = ?)")) {
-                deleteFirmenrechnung.setObject(1, primaryKeyValue);
-                int rowsAffected = deleteFirmenrechnung.executeUpdate();
-                System.out.println("Abhängige Firmenrechnungen gelöscht: " + rowsAffected + " Zeilen");
-            }
-
-            // 2. Einträge aus nachbestellung löschen
-            try (PreparedStatement deleteNachbestellung = connection.prepareStatement(
-                    "DELETE FROM nachbestellung WHERE Produkte_ID = ?")) {
-                deleteNachbestellung.setObject(1, primaryKeyValue);
-                int rowsAffected = deleteNachbestellung.executeUpdate();
-                System.out.println("Abhängige Nachbestellungen gelöscht: " + rowsAffected + " Zeilen");
-            }
-
-            // 3. Den Hauptdatensatz (Produkt) löschen
+            // Hauptdatensatz löschen
             String deleteQuery = "DELETE FROM " + getTableName() +
                     " WHERE " + primaryKeyField.getName() + " = ?";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
-
                 preparedStatement.setObject(1, primaryKeyValue);
 
                 int betroffeneZeilen = preparedStatement.executeUpdate();
@@ -218,9 +201,9 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
                 }
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Datenbankfehler: " + e.getMessage());
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Fehler beim Zugriff auf das Primärschlüsselfeld", e);
         }
     }
 
@@ -271,5 +254,9 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
             }
         }
         return false;
+    }
+
+    protected String getIdColumname() {
+        return getTableName() + "_ID";
     }
 }
