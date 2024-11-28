@@ -3,10 +3,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.List;
 
-
 import Factory.Kunden;
 import Factory.Produkte;
-
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -34,7 +32,6 @@ public class Application {
                 if (!isRuntimeActive) {
                     Main.clearKundenList();
                     Main.clearProdukteList();
-
                 }
 
                 kunden = Main.getKundenList();
