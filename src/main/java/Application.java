@@ -3,6 +3,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.List;
 
+
 import Factory.Kunden;
 import Factory.Produkte;
 
@@ -154,6 +155,97 @@ public class Application {
                 sendResponse(exchange, 405, "Method Not Allowed");
             }
         });
+
+        server.createContext("/api/items/kunden/delete", exchange -> {
+            if ("DELETE".equals(exchange.getRequestMethod())) {
+                try {
+                    String requestBody = new String(exchange.getRequestBody().readAllBytes());
+
+                    Kunden deleteKunde = gson.fromJson(requestBody, Kunden.class);
+
+                    if (deleteKunde.getKunden_ID() == -1) {
+                        sendResponse(exchange, 400, "Keine Kunden-ID für Delete angegeben");
+                        return;
+                    }
+
+                    Main.kundenDAO.delete(deleteKunde);
+
+                    sendJsonResponse(exchange, 200, "Kunde erfolgreich gelöscht");
+
+                } catch (Exception e) {
+                    sendResponse(exchange, 500, "Fehler beim Löschen des Kunden: " + e.getMessage());
+                }
+            } else {
+                sendResponse(exchange, 405, "Method not allowed");
+            }
+        });
+
+        server.createContext("/api/items/produkte/delete", exchange -> {
+            if ("DELETE".equals(exchange.getRequestMethod())) {
+
+                try {
+                    String requestBody = new String(exchange.getRequestBody().readAllBytes());
+
+                    Produkte deleteProdukt = gson.fromJson(requestBody, Produkte.class);
+
+                    if (deleteProdukt.getProdukte_ID() == -1) {
+                        sendResponse(exchange, 400, "Keine Produkt-ID für Delete angegeben");
+                        return;
+                    }
+
+                    Main.produkteDAO.delete(deleteProdukt);
+
+                    sendJsonResponse(exchange, 200, "Produkt erfolgreich gelöscht");
+                } catch (Exception e) {
+                    sendJsonResponse(exchange, 500, "Fehler beim Löschen des Produkt: " + e.getMessage());
+                }
+            } else {
+                sendResponse(exchange, 405, "Method not allowed");
+            }
+
+        });
+
+        server.createContext("/api/items/kunden/{id}", exchange -> {
+            if ("GET".equals(exchange.getRequestMethod())) {
+                try {
+                    int kundenId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[4]);
+                    Kunden kunde = Main.kundenDAO.getById(kundenId);
+
+                    if (kunde != null) {
+                        sendJsonResponse(exchange, 200, kunde);
+                    } else {
+                        sendResponse(exchange, 404, "Kunde nicht gefunden");
+                    }
+                } catch (NumberFormatException e) {
+                    sendResponse(exchange, 400, "Ungültige Kunden-ID");
+                }
+            } else {
+                sendResponse(exchange, 405, "Method Not Allowed");
+            }
+        });
+
+        server.createContext("/api/items/produkte/{id}", exchange -> {
+            if ("GET".equals(exchange.getRequestMethod())) {
+                try {
+                    int produkteId = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[4]);
+                    Produkte produkt = Main.produkteDAO.getById(produkteId);
+
+                    if (produkt != null) {
+                        sendJsonResponse(exchange, 200, produkt);
+                    } else {
+                        sendResponse(exchange, 404, "Produkt nicht gefunden");
+                    }
+                } catch (NumberFormatException e) {
+                    sendResponse(exchange, 400, "Ungültige Produkt-ID");
+                }
+            } else {
+                sendResponse(exchange, 405, "Method Not Allowed");
+            }
+        });
+
+        server.setExecutor(null);
+        server.start();
+        System.out.println("REST-API läuft auf Port " + serverPort);
 
         server.setExecutor(null);
         server.start();
