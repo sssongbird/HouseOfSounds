@@ -105,7 +105,7 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
     @Override
     public void update(T entity) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            // Primärschlüsselfeld finden
+
             Field primaryKeyField = findPrimaryKeyField(entity.getClass());
 
             System.out.println("Erfolg: " + primaryKeyField);
@@ -113,25 +113,21 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
                 throw new IllegalArgumentException("Kein Primärschlüsselfeld gefunden");
             }
 
-            // Listen für Update-Spalten vorbereiten
             List<String> updateColumns = new ArrayList<>();
             List<Object> updateValues = new ArrayList<>();
             Object primaryKeyValue = null;
 
-            // Durch Felder iterieren
             for (Field field : entity.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
 
                 try {
                     Object value = field.get(entity);
 
-                    // Null-Werte und Primärschlüsselfeld überspringen
                     if (value != null && !field.equals(primaryKeyField)) {
                         updateColumns.add(field.getName() + " = ?");
                         updateValues.add(value);
                     }
 
-                    // Primärschlüsselwert erfassen
                     if (field.getName().equals(primaryKeyField.getName())) {
                         primaryKeyValue = value;
                     }
@@ -142,27 +138,23 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
                 }
             }
 
-            // Primärschlüssel prüfen
             if (primaryKeyValue == null) {
                 throw new IllegalArgumentException("Primärschlüsselwert muss für Update gesetzt sein");
             }
 
-            // Update-Abfrage konstruieren
             String updateQuery = "UPDATE " + getTableName() +
                     " SET " + String.join(", ", updateColumns) +
                     " WHERE " + primaryKeyField.getName() + " = ?";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-                // Update-Werte setzen
+
                 int parameterIndex = 1;
                 for (Object value : updateValues) {
                     preparedStatement.setObject(parameterIndex++, value);
                 }
 
-                // Primärschlüsselwert am Ende setzen
                 preparedStatement.setObject(parameterIndex, primaryKeyValue);
 
-                // Update ausführen
                 int betroffeneZeilen = preparedStatement.executeUpdate();
 
                 if (betroffeneZeilen == 0) {
@@ -174,21 +166,18 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
             System.err.println("Datenbankfehler: " + e.getMessage());
             e.printStackTrace();
         }
-
-
     }
 
     @Override
     public void delete(T entity) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            // Primärschlüsselfeld finden
+
             Field primaryKeyField = findPrimaryKeyField(entity.getClass());
 
             if (primaryKeyField == null) {
                 throw new IllegalArgumentException("Kein Primärschlüsselfeld für Löschvorgang gefunden");
             }
 
-            // Den Wert des Primärschlüssels ermitteln
             primaryKeyField.setAccessible(true);
             Object primaryKeyValue = primaryKeyField.get(entity);
 
@@ -196,7 +185,6 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
                 throw new IllegalArgumentException("Primärschlüsselwert muss für Löschvorgang gesetzt sein");
             }
 
-            // Manuelles Löschen der abhängigen Einträge in richtiger Reihenfolge
             // 1. Einträge aus firmenrechnung löschen
             try (PreparedStatement deleteFirmenrechnung = connection.prepareStatement(
                     "DELETE FROM firmenrechnung WHERE Nachbestellung_ID IN (SELECT Nachbestellung_ID FROM nachbestellung WHERE Produkte_ID = ?)")) {
@@ -218,10 +206,9 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
                     " WHERE " + primaryKeyField.getName() + " = ?";
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
-                // Primärschlüsselwert setzen
+
                 preparedStatement.setObject(1, primaryKeyValue);
 
-                // Löschvorgang ausführen
                 int betroffeneZeilen = preparedStatement.executeUpdate();
 
                 if (betroffeneZeilen == 0) {
@@ -241,7 +228,6 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
     // Helper method to find primary key field
     private Field findPrimaryKeyField(Class<?> clazz) {
         for (Field field : clazz.getDeclaredFields()) {
-            // Überprüfen, ob der Feldname mit "ID" endet (z.B. "kunden_ID" oder "produkte_ID")
             if (field.getName().toUpperCase().endsWith("ID")) {
                 return field;
             }
@@ -251,21 +237,21 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
 
     private T mapResultSetToEntity(ResultSet resultSet, Class<T> entityClass) throws SQLException {
         try {
-            // Neue Instanz der Entität erstellen
+
             T entity = entityClass.getDeclaredConstructor().newInstance();
 
-            // Hole alle Felder der Entität
+
             Field[] fields = entityClass.getDeclaredFields();
             for (Field field : fields) {
-                field.setAccessible(true); // Falls private Felder vorhanden sind
+                field.setAccessible(true);
 
-                // Der Name des Feldes wird als Spaltenname in der DB angenommen
+
                 String columnName = field.getName();
 
-                // Überprüfe, ob das ResultSet die Spalte enthält
+
                 if (resultSetMetaDataContainsColumn(resultSet, columnName)) {
-                    Object value = resultSet.getObject(columnName); // Hole den Wert aus dem ResultSet
-                    field.set(entity, value); // Setze den Wert im Entitäten-Objekt
+                    Object value = resultSet.getObject(columnName);
+                    field.set(entity, value);
                 }
             }
 
@@ -286,6 +272,4 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
         }
         return false;
     }
-
-
 }
