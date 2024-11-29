@@ -62,7 +62,6 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
     }
 
 
-
     @Override
     public void save(T entity) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD)) {
