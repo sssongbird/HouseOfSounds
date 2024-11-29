@@ -1,6 +1,6 @@
 package Factory;
 import java.sql.ResultSet;
-import java.sql.ResultSet;
+
 
 public class PLZDoaImplement extends AbstractGenericDAO<PLZ> {
     @Override

@@ -16,4 +16,8 @@ public class ProdukteDaoImplement extends AbstractGenericDAO<Produkte> {
     protected String getTableName() {
         return "Produkte";
     }
+    @Override
+    protected String getIdColumname() {
+        return "Produkte_ID";
+    }
 }

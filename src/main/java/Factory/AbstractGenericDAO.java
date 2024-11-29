@@ -33,25 +33,34 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
     }
 
 
-    @Override
     public T getById(int id) {
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM " + getTableName() + " WHERE " + getIdColumname() + " = ?")) {
+        // Hole den Primärschlüssel-Spaltennamen
+        String idColumn = getIdColumname();
+        String sql = String.format("SELECT * FROM %s WHERE %s = ?", getTableName(), idColumn);
 
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            // Setze den Wert für den Primärschlüssel
             statement.setInt(1, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    // Die Methode mapResultSetToEntity aufrufen, um das ResultSet in die Entität zu konvertieren
                     return mapResultSetToEntity(resultSet);
                 }
             }
+
+        } catch (SQLException e) {
+            System.err.println("SQL-Fehler: " + e.getMessage());
+            throw new RuntimeException("Datenbankabfrage fehlgeschlagen", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Unerwarteter Fehler: " + e.getMessage());
+            throw new RuntimeException("Ein unerwarteter Fehler ist aufgetreten", e);
         }
 
         return null;
     }
+
 
 
     @Override
@@ -98,9 +107,9 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
         }
     }
 
-    private String getTableName(Class<?> entityClass) {
-        return entityClass.getSimpleName().toLowerCase();
-    }
+//    private String getTableName(Class<?> entityClass) {
+//        return entityClass.getClass().getSimpleName().toLowerCase();
+//    }
 
     @Override
     public void update(T entity) {
@@ -124,7 +133,7 @@ public abstract class AbstractGenericDAO<T> implements GenericDAO<T> {
                     Object value = field.get(entity);
 
                     if (value != null && !field.equals(primaryKeyField)) {
-                        updateColumns.add(field.getName() + " = ?");
+                        updateColumns.add(field.getName() + " ?");
                         updateValues.add(value);
                     }
 

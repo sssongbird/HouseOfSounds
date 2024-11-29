@@ -3,6 +3,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.List;
 
+
 import Factory.Kunden;
 import Factory.Produkte;
 
@@ -23,7 +24,7 @@ public class Application {
         int serverPort = 8000;
         HttpServer server = HttpServer.create(new InetSocketAddress(serverPort), 0);
 
-        // Endpunkt Kunden
+
         server.createContext("/api/items/kunden", exchange -> {
             if ("GET".equals(exchange.getRequestMethod())) {
                 List<Kunden> kunden;
@@ -63,6 +64,13 @@ public class Application {
         });
 
         server.createContext("/api/items/produkte", exchange -> {
+            /**
+             * Check if subpath  or Filter
+             *  if yes => route to Filter/getBy... Logic
+             *  if not => run normal logic
+             */
+
+
             if ("GET".equals(exchange.getRequestMethod())) {
                 List<Produkte> produkte;
 
@@ -96,6 +104,89 @@ public class Application {
             }
         });
 
+        server.createContext("/api/items/produkte/id/", exchange -> {
+            if ("GET".equals(exchange.getRequestMethod())) {
+                // Extrahiere die ID aus dem Pfad
+                String path = exchange.getRequestURI().getPath();
+                String[] pathParts = path.split("/");
+                if (pathParts.length > 5) {
+                    String idString = pathParts[5];
+
+                    System.out.println("Extrahierte Pfad: " + path);
+                    System.out.println("Extrahierte ID: " + idString);
+
+
+                    try {
+                        int id = Integer.parseInt(idString);
+
+                        if (!isRuntimeActive) {
+                            Main.clearProdukteList();
+                            Main.clearKundenList();
+                        }
+
+                        Produkte produkt = Main.produkteDAO.getById(id);
+
+                        System.out.println("Gefundenes Produkt: " + produkt);
+
+                        if (produkt != null) {
+                            System.out.println("Daten für Produkt-ID " + id + ": " + gson.toJson(produkt));
+                            sendJsonResponse(exchange, 200, produkt);
+                        } else {
+                            sendResponse(exchange, 404, "Produkt mit ID " + id + " nicht gefunden");
+                        }
+                    } catch (NumberFormatException e) {
+                        sendResponse(exchange, 400, "Ungültige Produkt-ID");
+                    }
+                } else {
+                    sendResponse(exchange, 400, "ID fehlt im Pfad");
+                }
+            } else {
+                sendResponse(exchange, 405, "Method Not Allowed");
+            }
+        });
+
+        server.createContext("/api/items/kunden/id/", exchange -> {
+            if ("GET".equals(exchange.getRequestMethod())) {
+                // Extrahiere die ID aus dem Pfad
+                String path = exchange.getRequestURI().getPath();
+                String[] pathParts = path.split("/");
+                if (pathParts.length > 5) {
+                    String idString = pathParts[5];
+
+                    System.out.println("Extrahierte Pfad: " + path);
+                    System.out.println("Extrahierte ID: " + idString);
+
+
+                    try {
+                        int id = Integer.parseInt(idString);
+
+                        if (!isRuntimeActive) {
+                            Main.clearProdukteList();
+                            Main.clearKundenList();
+                        }
+
+                        Produkte produkt = Main.produkteDAO.getById(id);
+
+                        System.out.println("Gefundenes Produkt: " + produkt);
+
+                        if (produkt != null) {
+                            System.out.println("Daten für Produkt-ID " + id + ": " + gson.toJson(produkt));
+                            sendJsonResponse(exchange, 200, produkt);
+                        } else {
+                            sendResponse(exchange, 404, "Produkt mit ID " + id + " nicht gefunden");
+                        }
+                    } catch (NumberFormatException e) {
+                        sendResponse(exchange, 400, "Ungültige Produkt-ID");
+                    }
+                } else {
+                    sendResponse(exchange, 400, "ID fehlt im Pfad");
+                }
+            } else {
+                sendResponse(exchange, 405, "Method Not Allowed");
+            }
+        });
+
+
         server.createContext("/api/items/kunden/update", exchange -> {
             if ("PUT".equals(exchange.getRequestMethod())) {
                 try {
@@ -128,19 +219,19 @@ public class Application {
         server.createContext("/api/items/produkte/update", exchange -> {
             if ("PUT".equals(exchange.getRequestMethod())) {
                 try {
-                    // Request Body auslesen
+
                     String requestBody = new String(exchange.getRequestBody().readAllBytes());
 
-                    // JSON in Produkte-Objekt umwandeln
+
                     Produkte updateProdukt = gson.fromJson(requestBody, Produkte.class);
 
-                    // Überprüfen, ob eine ID vorhanden ist
+
                     if (updateProdukt.getProdukte_ID() == -1) {
                         sendResponse(exchange, 400, "Keine Produkt-ID für Update angegeben");
                         return;
                     }
 
-                    // Versuch des Updates über DAO
+
                     Main.produkteDAO.update(updateProdukt);
 
                     sendJsonResponse(exchange, 200, "Produkt erfolgreich aktualisiert");
@@ -201,43 +292,6 @@ public class Application {
             }
 
         });
-
-
-        server.createContext("/api/items/{type}/{id}", exchange -> {
-            if ("GET".equals(exchange.getRequestMethod())) {
-                try {
-                    // Extrahiere den Entitätstyp (z.B. "kunden" oder "produkte") aus der URL
-                    String type = exchange.getRequestURI().getPath().split("/")[3];
-                    int id = Integer.parseInt(exchange.getRequestURI().getPath().split("/")[4]);
-
-                    // Den passenden DAO anhand des Entitätstyps finden
-                    Object entity = null;
-                    if ("kunden".equalsIgnoreCase(type)) {
-                        // Dynamisch die Methode getById aus dem KundenDAO aufrufen
-                        entity = Main.kundenDAO.getById(id);
-                    } else if ("produkte".equalsIgnoreCase(type)) {
-                        // Dynamisch die Methode getById aus dem ProdukteDAO aufrufen
-                        entity = Main.produkteDAO.getById(id);
-                    }
-
-                    if (entity != null) {
-                        sendJsonResponse(exchange, 200, entity);
-                    } else {
-                        sendResponse(exchange, 404, "Entität nicht gefunden");
-                    }
-
-                } catch (NumberFormatException e) {
-                    sendResponse(exchange, 400, "Ungültige ID");
-                }
-            } else {
-                sendResponse(exchange, 405, "Method Not Allowed");
-            }
-        });
-
-
-        server.setExecutor(null);
-        server.start();
-        System.out.println("REST-API läuft auf Port " + serverPort);
 
         server.setExecutor(null);
         server.start();
